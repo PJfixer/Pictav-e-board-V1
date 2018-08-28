@@ -55,21 +55,51 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
-     RPOR10bits.RP21R = 18 ; // REMAP on RP21
+   /*  RPOR10bits.RP21R = 18 ; // REMAP on RP21
      RPOR13bits.RP26R = 19;
      RPOR13bits.RP27R = 21;
      RPOR9bits.RP19R = 20 ;
      out_PWM(2,1,1206.0,99.0);
      out_PWM(2,2,1206.0,35.0);
      out_PWM(2,3,1206.0,62.0);
-     out_PWM(2,4,1206.0,88.0);
+     out_PWM(2,4,1206.0,88.0); */
      
      T1CONbits.TON = 0 ;
-    // T2CONbits.TON = 0 ;
+     T2CONbits.TON = 0 ;
      T3CONbits.TON = 0 ;
      T4CONbits.TON = 0 ;
      T5CONbits.TON = 0 ;
-//    InitializeTimer2For_PWM();
+
+ // configure T4
+ T4CONbits.TON = 0 ;
+ TMR4 = 0x0000;
+ T4CON = 0x0000;
+ T4CON = 0x2000;  
+ PR4 = 39062; //period value
+ //IEC0bits.T2IE = 1;
+ IFS1bits.T4IF= 0;
+ 
+ RPOR10bits.RP21R = 18 ; // REMAP on RP21
+ 
+ 
+/* Reset PWM */
+OC1CON1 = 0x0000;
+OC1CON2 = 0x0000;
+
+/* set PWM duty cycle to 50% */
+OC1R    = 19500 ;
+OC1RS   = 19500 ;
+
+/* configure PWM */
+OC1CON2 = 0x001f;   /* 0x001F = Sync with This OC module                               */
+OC1CON1 = 0x0800; /* src=Timer4 */  /* 0x1C08 = Clock source Fcyc, trigger mode 1, Mode 0 (disable OC1) */
+
+/* enable the PWM */
+OC1CON1 |= 0x0006;   /* Mode 6, Edge-aligned PWM Mode */
+ 
+ 
+ T4CONbits.TON = 1 ;
+     
     while (1)
     {
         LATFbits.LATF0 = 1 ; 
