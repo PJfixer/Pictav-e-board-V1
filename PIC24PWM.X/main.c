@@ -1,46 +1,3 @@
-/**
-  Generated Main Source File
-
-  Company:
-    Microchip Technology Inc.
-
-  File Name:
-    main.c
-
-  Summary:
-    This is the main file generated using PIC24 / dsPIC33 / PIC32MM MCUs
-
-  Description:
-    This header file provides implementations for driver APIs for all modules selected in the GUI.
-    Generation Information :
-        Product Revision  :  PIC24 / dsPIC33 / PIC32MM MCUs - pic24-dspic-pic32mm : 1.55
-        Device            :  PIC24FJ64GA306
-    The generated drivers are tested against the following:
-        Compiler          :  XC16 v1.34
-        MPLAB             :  MPLAB X v4.15
-*/
-
-/*
-    (c) 2016 Microchip Technology Inc. and its subsidiaries. You may use this
-    software and any derivatives exclusively with Microchip products.
-
-    THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
-    EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
-    WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
-    PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
-    WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
-
-    IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
-    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
-    WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
-    BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
-    FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
-    ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
-    THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
-
-    MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
-    TERMS.
-*/
 
 #include "mcc_generated_files/mcc.h"
 #include "pwm.h"
@@ -55,14 +12,66 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
-   /*  RPOR10bits.RP21R = 18 ; // REMAP on RP21
+    
+    /****************************************************************************
+     * Setting the Output Latch SFR(s)
+     ***************************************************************************/
+    LATB = 0x0000;
+    LATC = 0x0000;
+    LATD = 0x0000;
+    LATE = 0x0000;
+    LATF = 0x0000;
+    LATG = 0x0000;
+
+    /****************************************************************************
+     * Setting the GPIO Direction SFR(s)
+     ***************************************************************************/
+    TRISB = 0x0000;
+    TRISC = 0x0000;
+    TRISD = 0x0000;
+    TRISE = 0x0000;
+    TRISF = 0x0000;
+    TRISG = 0x0000;
+
+    /****************************************************************************
+     * Setting the Weak Pull Up and Weak Pull Down SFR(s)
+     ***************************************************************************/
+    CNPD1 = 0x0000;
+    CNPD2 = 0x0000;
+    CNPD3 = 0x0000;
+    CNPD4 = 0x0000;
+    CNPD5 = 0x0000;
+    CNPD6 = 0x0000;
+    CNPU1 = 0x0000;
+    CNPU2 = 0x0000;
+    CNPU3 = 0x0000;
+    CNPU4 = 0x0000;
+    CNPU5 = 0x0000;
+    CNPU6 = 0x0000;
+
+    /****************************************************************************
+     * Setting the Open Drain SFR(s)
+     ***************************************************************************/
+    ODCB = 0x0000;
+    ODCC = 0x0000;
+    ODCD = 0x0000;
+    ODCE = 0x0000;
+    ODCF = 0x0000;
+    ODCG = 0x0000;
+
+    /****************************************************************************
+     * Setting the Analog/Digital Configuration SFR(s)
+     ***************************************************************************/
+    ANSB = 0x0000;
+    ANSD = 0x0000;
+    ANSE = 0x0000;
+    ANSG = 0x0000;
+    
+     RPOR10bits.RP21R = 18 ; // REMAP OC1 on RP21 --> page 175
      RPOR13bits.RP26R = 19;
      RPOR13bits.RP27R = 21;
      RPOR9bits.RP19R = 20 ;
-     out_PWM(2,1,1206.0,99.0);
-     out_PWM(2,2,1206.0,35.0);
-     out_PWM(2,3,1206.0,62.0);
-     out_PWM(2,4,1206.0,88.0); */
+
      
      T1CONbits.TON = 0 ;
      T2CONbits.TON = 0 ;
@@ -70,35 +79,45 @@ int main(void)
      T4CONbits.TON = 0 ;
      T5CONbits.TON = 0 ;
 
- // configure T4
+ 
+ 
+// configure T4
  T4CONbits.TON = 0 ;
  TMR4 = 0x0000;
- T4CON = 0x0000;
- T4CON = 0x2000;  
- PR4 = 39062; //period value
- //IEC0bits.T2IE = 1;
- IFS1bits.T4IF= 0;
+ T4CON = 0x0000; // reset T4CON
+ T4CON = 0x2000;   //Disable on idle
+ T4CONbits.TCKPS = 3 ; // Presacle 256
+ PR4 = 1000; // set 1s delay
+
+ IEC1bits.T4IE = 1; //enable T4 interupt
+ IFS1bits.T4IF= 0; //disable flag...
  
- RPOR10bits.RP21R = 18 ; // REMAP on RP21
  
  
-/* Reset PWM */
+//Reset Output compare register --> P213 section 15.3 Pulse-Width Modulation (PWM) Mode
 OC1CON1 = 0x0000;
 OC1CON2 = 0x0000;
 
-/* set PWM duty cycle to 50% */
-OC1R    = 19500 ;
-OC1RS   = 19500 ;
+//set PWM duty cycle to 50% 
+OC1R    = 19532 ;
+OC1RS   = 39063 ;
+//select sync source as explain in datasheet --> page    (not really understand what is it use for )
+OC1CON2bits.SYNCSEL = 0x1F ;
+OC1CON2bits.OCTRIG = 0 ; 
 
-/* configure PWM */
-OC1CON2 = 0x001f;   /* 0x001F = Sync with This OC module                               */
-OC1CON1 = 0x0800; /* src=Timer4 */  /* 0x1C08 = Clock source Fcyc, trigger mode 1, Mode 0 (disable OC1) */
+//select T4 as source
+OC1CON1bits.OCTSEL = 0b010 ; // --> page 
 
-/* enable the PWM */
-OC1CON1 |= 0x0006;   /* Mode 6, Edge-aligned PWM Mode */
+//configure PWM 
+OC1CON1bits.OCM = 0b110; // edge PWM mode                           
+
+
+
+
  
+
  
- T4CONbits.TON = 1 ;
+T4CONbits.TON = 1 ; // enable T4
      
     while (1)
     {
@@ -113,6 +132,16 @@ OC1CON1 |= 0x0006;   /* Mode 6, Edge-aligned PWM Mode */
 
     return -1;
 }
+
+
+void __attribute__((__interrupt__, no_auto_psv)) _T4Interrupt( void )
+{
+    IFS1bits.T4IF = 0; // reset T4 interupt flag
+
+    LATFbits.LATF1 =~  LATFbits.LATF1; //Toggle led to check T4 is working
+
+
+} 
 /**
  End of File
 */
